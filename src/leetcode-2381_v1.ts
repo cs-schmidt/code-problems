@@ -11,34 +11,39 @@
  *   5. s consists of lowercase English letters.
  */
 
-// TODO: Finish solution.
-// NOTE: There's an approach with an interval tree data structure.
-
 /**
- * Function: shiftLetters
+ * Function: shiftingLetters
  * Algorithmic Paradigm: Naive
  * Programming Paradigm: Imperative
  * Complexity:
- *   - Time: ???
- *   - Space: ???
+ *   - Time: O(|str|^2); an upper bound
+ *   - Space: O(|str|)
  */
 function shiftingLetters(str: string, shifts: number[][]): string {
-  const shiftedLetters: string[] = [];
-  shifts.forEach((shift) => {
-    const charIndex = shift[0];
-    const shiftTail = shift[1];
-    const direction = shift[2];
-    for (let i = charIndex; i <= shiftTail; i++) {
-      let char = str[charIndex];
-      char = shiftLetter(char, direction);
+  const shiftStack: number[][] = shifts;
+  const codePoints: number[] = Array.from(str, (char) => char.codePointAt(0)) as number[];
+
+  while (shiftStack.length) {
+    const shift: number[] = shiftStack.pop() as number[];
+
+    const markerHead = shift[0];
+    const markerTail = shift[1];
+    const move = shift[2] == 1 ? 1 : -1;
+
+    for (let i = markerHead; i <= markerTail; i++) {
+      const baseCodePoint = codePoints[i] - 97;
+      codePoints[i] = 97 + mod(baseCodePoint + move, 26);
     }
-  });
+  }
 
-  return shiftedLetters.join('');
+  return String.fromCodePoint(...codePoints);
 
-  // =================================================================
+  // ================================================================================
 
-  function shiftLetter(char: string, direction: number): string {
-    return char;
+  /** Computes floored modulo of `n` divided by `m`. */
+  function mod(n: number, m: number) {
+    return ((n % m) + m) % m;
   }
 }
+
+export {};
